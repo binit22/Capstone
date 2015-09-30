@@ -168,6 +168,10 @@ public class Simulator {
 
 		int cacheSize = this.minCacheSize;
 		int noOfClients = this.noOfClients;
+		fWriter.write("Cache size");
+		for(int i = 0; i < queryPercent.length; i++)
+			fWriter.write(Helper.COMMA + "Total Cache Size" + Helper.SLASH + "No Of Queries" + Helper.COMMA + "BF" + Helper.COMMA + "IABF");
+		fWriter.write(Helper.NEW_LINE);
 		
 		while (cacheSizeIncrementer > 0 && cacheSize <= maxCacheSize) {
 			int cacheSizeInSystem = (noOfClients + 1) * cacheSize;
@@ -175,7 +179,7 @@ public class Simulator {
 			bf.initialize(cacheSize, cacheSize, cacheSize, data.toArray(new String[data.size()]));
 			iabf.initialize(cacheSize, cacheSize, cacheSize, data.toArray(new String[data.size()]));
 
-			fWriter.write(cacheSize);
+			fWriter.write(new Integer(cacheSize).toString());
 			
 			for (double percent : queryPercent) {
 				int noOfQueries = (int)(percent * (double)cacheSizeInSystem);
@@ -196,17 +200,21 @@ public class Simulator {
 		}
 	}
 	
-	private void compareWRTBloomFilterSize(BloomFilter bf, BloomFilter iabf, double[] percentBFSize, FileWriter writer) throws IOException {
+	private void compareWRTBloomFilterSize(BloomFilter bf, BloomFilter iabf, double[] percentBFSize, FileWriter fWriter) throws IOException {
 		
 		int cacheSize = this.minCacheSize;
 		int noOfClients = this.noOfClients;
-
+		fWriter.write("Cache size");
+		for(int i = 0; i < queryPercent.length; i++)
+			fWriter.write(Helper.COMMA + "Total Cache Size" + Helper.SLASH + "Total BF Size" + Helper.COMMA + "BF" + Helper.COMMA + "IABF");
+		fWriter.write(Helper.NEW_LINE);
+		
 		while (cacheSizeIncrementer > 0 && cacheSize <= maxCacheSize) {
 			int noOfQueries = (noOfClients + 1) * cacheSize;
 			
 			List<String> membershipQueries = generateQueries(noOfQueries);
 			
-			writer.write(new Integer(cacheSize).toString());
+			fWriter.write(new Integer(cacheSize).toString());
 			
 			for (double percent : percentBFSize) {
 				int bloomFilterSize = (int)(percent * (double)cacheSize);
@@ -217,13 +225,13 @@ public class Simulator {
 				bf.calculateFalsePositives(membershipQueries);
 				iabf.calculateFalsePositives(membershipQueries);
 				
-				writer.write(Helper.COMMA + cacheSize + Helper.SLASH + bloomFilterSize);
-				writer.write(Helper.COMMA + bf.getFalsePositives() + Helper.COMMA + iabf.getFalsePositives());
+				fWriter.write(Helper.COMMA + noOfQueries + Helper.SLASH + (noOfClients + 1) * bloomFilterSize);
+				fWriter.write(Helper.COMMA + bf.getFalsePositives() + Helper.COMMA + iabf.getFalsePositives());
 				
 				bf.setFalsePositives(0);
 				iabf.setFalsePositives(0);
 			}
-			writer.write(Helper.NEW_LINE);
+			fWriter.write(Helper.NEW_LINE);
 			cacheSize += cacheSizeIncrementer;
 		}
 	}
