@@ -36,8 +36,9 @@ public class IABFClient extends Client{
 			HashProvider hash = new HashProvider(data, bloomFilterSize);
 			int[] bitPositions = hash.getBitPositions();
 			for(int i : bitPositions) {
-				if(bloomFilter[i] < importanceFunction(data))
-					bloomFilter[i] = importanceFunction(data);
+				int impValue = importanceFunction(data);
+				if(bloomFilter[i] < impValue)
+					bloomFilter[i] = impValue;
 			}
 		}
 	}

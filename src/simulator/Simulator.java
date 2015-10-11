@@ -135,16 +135,18 @@ public class Simulator {
 		File outputFile = null;
 		FileWriter fWriter = null;
 		try {
-			System.out.println("Comparison Starts!");
-			
 			outputFile = new File(this.inputFile + Helper.UNDERSCORE +"output.csv");
 			fWriter = new FileWriter(outputFile, true);
 			
+			System.out.println("Experiment 1 Starts!");
 			compareWRTNoOfQueryRequests(bf, iabf, queryPercent, fWriter);
-			fWriter.write(Helper.NEW_LINE);
-			compareWRTBloomFilterSize(bf, iabf, percentBFSize, fWriter);
+			System.out.println("Experiment 1 Ends!");
 			
-			System.out.println("Comparison Ends!");
+			fWriter.write(Helper.NEW_LINE);
+			
+			System.out.println("Experiment 2 Starts!");
+			compareWRTBloomFilterSize(bf, iabf, percentBFSize, fWriter);
+			System.out.println("Experiment 2 Ends!");
 		}
 		catch(IOException ex){
 			System.err.println(ex.getMessage());
@@ -170,7 +172,7 @@ public class Simulator {
 		int noOfClients = this.noOfClients;
 		fWriter.write("Cache size");
 		for(int i = 0; i < queryPercent.length; i++)
-			fWriter.write(Helper.COMMA + "Total Cache Size" + Helper.SLASH + "No Of Queries" + Helper.COMMA + "BF" + Helper.COMMA + "IABF");
+			fWriter.write(Helper.COMMA + "Total Cache Size" + Helper.SLASH + "No Of Queries" + Helper.COMMA + "Bloom Filter" + Helper.COMMA + "Importance Aware Bloom Filter");
 		fWriter.write(Helper.NEW_LINE);
 		
 		while (cacheSizeIncrementer > 0 && cacheSize <= maxCacheSize) {
@@ -189,7 +191,7 @@ public class Simulator {
 				bf.calculateFalsePositives(membershipQueries);
 				iabf.calculateFalsePositives(membershipQueries);
 				
-				fWriter.write(Helper.COMMA + cacheSizeInSystem + Helper.SLASH + noOfQueries);
+				fWriter.write(Helper.COMMA + cacheSizeInSystem + Helper.SLASH + noOfQueries * noOfClients);
 				fWriter.write(Helper.COMMA + bf.getFalsePositives() + Helper.COMMA + iabf.getFalsePositives());
 				
 				bf.setFalsePositives(0);
@@ -206,7 +208,7 @@ public class Simulator {
 		int noOfClients = this.noOfClients;
 		fWriter.write("Cache size");
 		for(int i = 0; i < queryPercent.length; i++)
-			fWriter.write(Helper.COMMA + "Total Cache Size" + Helper.SLASH + "Total BF Size" + Helper.COMMA + "BF" + Helper.COMMA + "IABF");
+			fWriter.write(Helper.COMMA + "Total Cache Size" + Helper.SLASH + "Total BF Size" + Helper.COMMA + "Bloom Filter" + Helper.COMMA + "Importance Aware Bloom Filter");
 		fWriter.write(Helper.NEW_LINE);
 		
 		while (cacheSizeIncrementer > 0 && cacheSize <= maxCacheSize) {
