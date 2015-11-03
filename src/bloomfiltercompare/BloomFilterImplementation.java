@@ -76,7 +76,7 @@ public class BloomFilterImplementation implements BloomFilter {
 
 				if(!clientsVisited.contains(index)) {
 					
-					if(clients[index].bloomFilterContains(query)) {
+					if(clients[index].contains(query)) {
 						
 						if(clients[index].findDataBlockInCache(query) == -1) {
 							noOfFalsePositives += 1;
@@ -89,7 +89,7 @@ public class BloomFilterImplementation implements BloomFilter {
 			}
 
 			if(clientsVisited.size() == noOfClients) {
-				if(server.bloomFilterContains(query)) {
+				if(server.contains(query)) {
 					if(server.findDataBlockInCache(query) == -1) {
 						noOfFalsePositives += 1;
 					}

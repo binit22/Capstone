@@ -13,12 +13,12 @@ public class IABFClient extends Client{
 	private final int M = 7;
 	private final int P = 10;
 
-	public IABFClient(int cacheSize, int bloomFilterSize, long clientId) {
+	public IABFClient(int cacheSize, int bloomFilterSize, int clientId) {
 		super(cacheSize, clientId, bloomFilterSize);
 	}
 
 	public void updateBF(String data) {
-		if(!bloomFilterContains(data)) {
+		if(!contains(data)) {
 			Random random = new Random();
 			List<Integer> pIndexList = new ArrayList<Integer>();
 			
@@ -43,6 +43,26 @@ public class IABFClient extends Client{
 		}
 	}
 
+	public boolean contains(String data) {
+		HashProvider hash = new HashProvider(data, bloomFilterSize);
+		int[] bitPositions = hash.getBitPositions();
+		for(int i : bitPositions) {
+			if(bloomFilter[i] == 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public boolean initializeClientCache(String[] data, int startIndex, int endIndex) {
+		this.clientCache.populateCache(data, startIndex, endIndex);
+		
+		for(int index = startIndex; index < endIndex; index++) {			
+			updateBF(data[index]);
+		}
+		return true;
+	}
+	
 	// Importance Aware Bloom Filter 2-C
 	private int importanceFunction(String data) {
 		if(data.length() < dataSizeLimit) {

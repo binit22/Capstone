@@ -2,26 +2,30 @@ package simulator;
 
 public abstract class Server {
 
-	protected long serverId;
-	protected Cache cache;
+	protected int serverId;
+	protected Cache serverCache;
+	protected Cache disk;
 	protected int cacheSize;
+	protected int diskSize;
 	protected int bloomFilterSize;
 	protected int[] bloomFilter;
 	
-	public Server(int cacheSize, long serverId, int bloomFilterSize) {
-		this.cache = new Cache(cacheSize);
+	public Server(int cacheSize, int serverId, int bloomFilterSize, int diskSize) {
+		this.serverCache = new Cache(cacheSize);
+		this.disk = new Cache(diskSize);
 		this.cacheSize = cacheSize;
+		this.diskSize = diskSize;
 		this.serverId = serverId;
 		this.bloomFilterSize = bloomFilterSize;
 		this.bloomFilter = new int[bloomFilterSize];
 	}
 
-	public long getServerId() {
+	public int getServerId() {
 		return this.serverId;
 	}
 
 	public Cache getServerCache() {
-		return this.cache;
+		return this.serverCache;
 	}
 
 	public int getCacheSize() {
@@ -29,11 +33,15 @@ public abstract class Server {
 	}
 
 	public int findDataBlockInCache(String data) {
-		return this.cache.findDataBlock(data);
+		return this.serverCache.findDataBlock(data);
 	}
 
 	public DataBlock getDataBlockFromCache(int index) {
-		return this.cache.getDataBlock(index);
+		return this.serverCache.getDataBlock(index);
+	}
+	
+	public DataBlock getDataBlockFromDisk(int index) {
+		return this.disk.getDataBlock(index);
 	}
 	
 	public boolean equals(Object obj) {
@@ -44,24 +52,21 @@ public abstract class Server {
 		return super.hashCode();
 	}
 
-	public boolean bloomFilterContains(String data) {
-		HashProvider hash = new HashProvider(data, bloomFilterSize);
-		int[] bitPositions = hash.getBitPositions();
-		for(int i : bitPositions) {
-			if(bloomFilter[i] == 0) {
-				return false;
-			}
+	public abstract boolean contains(String data);
+	
+	public boolean initializeServerCache(String[] data, int startIndex, int endIndex) {
+		if(this.cacheSize != endIndex-startIndex){
+			return false;
 		}
+		this.serverCache.populateCache(data, startIndex, endIndex);
 		return true;
 	}
 	
-	public void initializeServerCache(String[] data, int startIndex, int endIndex) {
-		this.cache.populateCache(data, startIndex, endIndex);
-		
-		for(int index = startIndex; index < endIndex; index++) {
-			populateBF(data[index]);
+	public boolean initializeServerDisk(String[] data, int startIndex, int endIndex) {
+		if(this.diskSize != endIndex-startIndex){
+			return false;
 		}
+		this.disk.populateCache(data, startIndex, endIndex);
+		return true;
 	}
-	
-	public abstract void populateBF(String data);
 }

@@ -1,10 +1,19 @@
 package simulator;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class DataBlock {
 	private String data;
+	public int recirculationCount;
+	public boolean isCached;
+	public Set<Integer> clientList;
 	
 	public DataBlock(String data) {
 		this.data = data;
+		this.recirculationCount = -1;
+		this.clientList = new HashSet<Integer>();
+//		isCached = false;
 	}
 	
 	public String getData() {		
@@ -15,9 +24,9 @@ public class DataBlock {
 		return this.data.compareTo(dataBlock.getData());
 	}
 	
-	public boolean isEqual(String data) {
+	/*public boolean isEqual(String data) {
 		return this.data.equals(data)? true: false;
-	}
+	}*/
 	
 	public int hashCode() {
 		return this.data.hashCode();

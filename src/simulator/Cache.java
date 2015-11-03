@@ -19,9 +19,13 @@ public class Cache {
 
 	public int findDataBlock(String data) {
 		for(int i = 0; i < this.cache.length; i++) {
-			if(this.cache[i].isEqual(data))
+			if(this.cache[i].getData().equals(data))
 				return i;
 		}
 		return -1;
+	}
+	
+	public void updateCache(int index, DataBlock block) {
+		this.cache[index] = block;
 	}
 }

@@ -13,12 +13,12 @@ public class IABFServer extends Server{
 	private final int M = 5;
 	private final int P = 7;
 	
-	public IABFServer(int cacheSize, int bloomFilterSize, long serverId) {
-		super(cacheSize, serverId, bloomFilterSize);
+	public IABFServer(int cacheSize, int bloomFilterSize, int serverId) {
+		super(cacheSize, serverId, bloomFilterSize, cacheSize);
 	}
 	
 	public void populateBF(String data) {
-		if(!bloomFilterContains(data)) {
+		if(!contains(data)) {
 			List<Integer> pIndexList = new ArrayList<Integer>();
 
 			while(pIndexList.size() != P) {
@@ -42,6 +42,26 @@ public class IABFServer extends Server{
 					bloomFilter[i] = importanceFunction(data);
 			}
 		}
+	}
+	
+	public boolean initializeServerCache(String[] data, int startIndex, int endIndex) {
+		this.serverCache.populateCache(data, startIndex, endIndex);
+		
+		for(int index = startIndex; index < endIndex; index++) {
+			populateBF(data[index]);
+		}
+		return true;
+	}
+	
+	public boolean contains(String data) {
+		HashProvider hash = new HashProvider(data, bloomFilterSize);
+		int[] bitPositions = hash.getBitPositions();
+		for(int i : bitPositions) {
+			if(bloomFilter[i] == 0) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	// Importance Aware Bloom Filter 2-C
